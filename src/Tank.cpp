@@ -5,20 +5,21 @@
 
 #include "GlobalConstants.h"
 
+#include <unordered_map>
+#include <functional>
+
 void Tank::DrawGun(QPainter& painter, int center, int gunLength) const {
-  switch (m_direction) {
-    case Direction::Up:
-      painter.drawLine(center, center, center, center - gunLength);
-      break;
-    case Direction::Down:
-      painter.drawLine(center, center, center, center + gunLength);
-      break;
-    case Direction::Left:
-      painter.drawLine(center, center, center - gunLength, center);
-      break;
-    case Direction::Right:
-      painter.drawLine(center, center, center + gunLength, center);
-      break;
+  using Handler = std::function<void(QPainter&, int, int)>;
+  static const std::unordered_map<Direction, Handler> handlers = {
+      {Direction::Up, [](QPainter& p, int c, int g) { p.drawLine(c, c, c, c - g); }},
+      {Direction::Down, [](QPainter& p, int c, int g) { p.drawLine(c, c, c, c + g); }},
+      {Direction::Left, [](QPainter& p, int c, int g) { p.drawLine(c, c, c - g, c); }},
+      {Direction::Right, [](QPainter& p, int c, int g) { p.drawLine(c, c, c + g, c); }}
+  };
+
+  auto it = handlers.find(m_direction);
+  if (it != handlers.end()) {
+    it->second(painter, center, gunLength);
   }
 }
 

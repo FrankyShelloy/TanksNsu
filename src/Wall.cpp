@@ -22,23 +22,28 @@ Wall::Wall(qreal x, qreal y) {
   painter.fillRect(18, 2, kPanelSize, kPanelSize, panelColor);
   painter.fillRect(2, 18, kPanelSize, kPanelSize, panelColor);
   painter.fillRect(18, 18, kPanelSize, kPanelSize, panelColor);
-
-  painter.setPen(Qt::NoPen);
-  painter.setBrush(Qt::black);
-  const struct { int x; int y; } rivets[] = {
-    {4, 4},  {12, 4},  {4, 12},  {12, 12},
-    {20, 4}, {28, 4},  {20, 12}, {28, 12},
-    {4, 20}, {12, 20}, {4, 28},  {12, 28},
-    {20, 20},{28, 20},{20, 28},  {28, 28}
-  };
-  for (const auto& r : rivets) {
-    painter.drawEllipse(r.x - kRivetRadius, r.y - kRivetRadius,
-                        2 * kRivetRadius, 2 * kRivetRadius);
-  }
+  
+  InitRivets(painter);
 
   painter.setPen(QPen(QColor(30, 30, 30), 2));
   painter.drawRect(0, 0, kWallSize - 1, kWallSize - 1);
 
   painter.end();
   setPixmap(pixmap);
+}
+
+void Wall::InitRivets(QPainter& painter) {
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(Qt::black);
+  constexpr std::array<std::pair<int,int>,16> rivets = {{
+    {4, 4},  {12, 4},  {4, 12},  {12, 12},
+    {20, 4}, {28, 4},  {20, 12}, {28, 12},
+    {4, 20}, {12, 20}, {4, 28},  {12, 28},
+    {20, 20},{28, 20},{20, 28},  {28, 28}
+  }};
+
+  for (const auto& r : rivets) {
+    painter.drawEllipse(r.first - kRivetRadius, r.second - kRivetRadius,
+                        2 * kRivetRadius, 2 * kRivetRadius);
+  }
 }
