@@ -24,7 +24,6 @@
 #include "GlobalConstants.h"
 
 static int s_playerFireCooldown = 0;
-static GameModel* s_model = nullptr;
 
 GameScane::GameScane(QObject* parent)
     : QGraphicsScene(parent),
@@ -33,8 +32,11 @@ GameScane::GameScane(QObject* parent)
   setSceneRect(0, 0, kSceneWidth, kSceneHeight);
   setBackgroundBrush(QColor(20, 40, 20));
 
-  m_playerTank = std::make_unique<Tank>(kSceneWidth / 2, kSceneHeight / 2);
-  addItem(m_playerTank.get());
+  m_model = new GameModel(this);
+  m_model->SetLives(kInitialPlayerLives);
+  m_model->SetKills(0);
+  m_model->SetPlayer(std::make_unique<Tank>(kSceneWidth / 2, kSceneHeight / 2));
+  addItem(m_model->GetPlayer());
 
   m_livesText = new QGraphicsTextItem();
   m_livesText->setZValue(10);
@@ -50,43 +52,34 @@ GameScane::GameScane(QObject* parent)
   connect(&m_gameTimer, &QTimer::timeout, this, &GameScane::Update);
   m_gameTimer.start();
 
-  s_model = new GameModel(this);
-  s_model->SetLives(kInitialPlayerLives);
-  s_model->SetKills(0);
-  connect(s_model, &GameModel::livesChanged, this, &GameScane::UpdateLivesDisplay);
-  connect(s_model, &GameModel::scoreChanged, this, &GameScane::UpdateScoreDisplay);
-  connect(s_model, &GameModel::gameOver, this, &GameScane::ShowGameOver);
-  connect(s_model, &GameModel::gameWon, this, &GameScane::ShowWinScreen);
+  connect(m_model, &GameModel::livesChanged, this, &GameScane::UpdateLivesDisplay);
+  connect(m_model, &GameModel::scoreChanged, this, &GameScane::UpdateScoreDisplay);
+  connect(m_model, &GameModel::gameOver, this, &GameScane::ShowGameOver);
+  connect(m_model, &GameModel::gameWon, this, &GameScane::ShowWinScreen);
   UpdateLivesDisplay();
   UpdateScoreDisplay();
 }
 
 GameScane::~GameScane() {
-  // Remove items that are owned by unique_ptr so QGraphicsScene won't try to delete them later
-  for (auto& up : m_bullets) if (up) removeItem(up.get());
-  for (auto& up : m_enemyBullets) if (up) removeItem(up.get());
-  for (auto& up : m_walls) if (up) removeItem(up.get());
-  for (auto& up : m_brickWalls) if (up) removeItem(up.get());
-  if (m_playerTank) removeItem(m_playerTank.get());
+  if (m_model) {
+    for (auto* b : m_model->GetBullets()) if (b) removeItem(b);
+    for (auto* b : m_model->GetEnemyBullets()) if (b) removeItem(b);
+    for (auto* w : m_model->GetWalls()) if (w) removeItem(w);
+    for (auto* br : m_model->GetBricks()) if (br) removeItem(br);
+    if (m_model->GetPlayer()) removeItem(m_model->GetPlayer());
 
-  // Clean up raw-pointer containers: remove from scene and delete
-  for (auto* enemy : m_enemyTanks) {
-    if (enemy) {
-      removeItem(enemy);
-      delete enemy;
-    }
+    for (auto* e : m_model->GetEnemyTanks()) if (e) removeItem(e);
+    for (auto* bo : m_model->GetBonuses()) if (bo) removeItem(bo);
+
+    m_model->ClearBullets();
+    m_model->ClearEnemyBullets();
+    m_model->ClearWalls();
+    m_model->ClearBricks();
+    m_model->ClearEnemyTanks();
+    m_model->ClearBonuses();
+    m_model->ClearPlayer();
   }
-  m_enemyTanks.clear();
 
-  for (auto* bonus : m_bonuses) {
-    if (bonus) {
-      removeItem(bonus);
-      delete bonus;
-    }
-  }
-  m_bonuses.clear();
-
-  // Remove optional graphics items
   auto cleanupOptional = [this](auto*& ptr) {
     if (ptr) {
       removeItem(ptr);
@@ -104,6 +97,7 @@ GameScane::~GameScane() {
   cleanupOptional(m_winRestartText);
   cleanupOptional(m_livesText);
   cleanupOptional(m_scoreText);
+  delete m_model;
 }
 
 void GameScane::InitializeLevel() {
@@ -137,11 +131,11 @@ void GameScane::InitializeLevel() {
       qreal posY = y * kTileSize;
 
       if (cell == 'W') {
-        m_walls.emplace_back(std::make_unique<Wall>(posX, posY));
-        addItem(m_walls.back().get());
+        Wall* w = m_model->AddWall(std::make_unique<Wall>(posX, posY));
+        addItem(w);
       } else if (cell == 'B') {
-        m_brickWalls.emplace_back(std::make_unique<BrickWall>(posX, posY));
-        addItem(m_brickWalls.back().get());
+        BrickWall* br = m_model->AddBrick(std::make_unique<BrickWall>(posX, posY));
+        addItem(br);
       } else if (cell == ' ') {
         m_freeSpawnPoints.append(QPointF(posX, posY));
       }
@@ -155,23 +149,20 @@ void GameScane::InitializeLevel() {
     
       int r = QRandomGenerator::global()->bounded(0, 3);
       if (r == 0) {
-        auto* bonus = new HealthBonus(spawn.x(), spawn.y());
-        m_bonuses.append(bonus);
+        Bonus* bonus = m_model->AddBonus(std::make_unique<HealthBonus>(spawn.x(), spawn.y()));
         addItem(bonus);
       } else if (r == 1) {
-        auto* bonus = new MineBonus(spawn.x(), spawn.y());
-        m_bonuses.append(bonus);
+        Bonus* bonus = m_model->AddBonus(std::make_unique<MineBonus>(spawn.x(), spawn.y()));
         addItem(bonus);
       } else {
-        auto* bonus = new ScoreBonus(spawn.x(), spawn.y());
-        m_bonuses.append(bonus);
+        Bonus* bonus = m_model->AddBonus(std::make_unique<ScoreBonus>(spawn.x(), spawn.y()));
         addItem(bonus);
     }
   }
 }
 
 void GameScane::Update() {
-  if (s_model->IsGameOver() || s_model->IsGameWon()) {
+  if (m_model->IsGameOver() || m_model->IsGameWon()) {
     return;
   }
 
@@ -187,7 +178,8 @@ void GameScane::Update() {
 }
 
 void GameScane::HandlePlayerInputAndMovement() {
-  Direction desiredDirection = m_playerTank->GetDirection();
+  auto* player = m_model->GetPlayer();
+  Direction desiredDirection = player->GetDirection();
   bool shouldMove = false;
 
   if (m_pressedKeys.contains(Qt::Key_Left)) {
@@ -204,16 +196,16 @@ void GameScane::HandlePlayerInputAndMovement() {
     shouldMove = true;
   }
 
-  m_playerTank->SetDirection(desiredDirection);
+  player->SetDirection(desiredDirection);
 
   if (shouldMove) {
-    QRectF futureRect = m_playerTank->GetFutureRect(desiredDirection);
+    QRectF futureRect = player->GetFutureRect(desiredDirection);
     if (!IsCollidingWithAnyWall(futureRect)) {
-      m_playerTank->Move();
+      player->Move();
     }
   }
 
-  m_playerTank->Update();
+  player->Update();
 }
 
 void GameScane::SpawnEnemiesIfNeeded() {
@@ -222,28 +214,29 @@ void GameScane::SpawnEnemiesIfNeeded() {
     return;
   }
 
-  if (m_freeSpawnPoints.isEmpty() || m_enemyTanks.size() >= kMaxEnemies) {
+  if (m_freeSpawnPoints.isEmpty() || m_model->GetEnemyTanksCount() >= kMaxEnemies) {
     return;
   }
 
   int idx = QRandomGenerator::global()->bounded(m_freeSpawnPoints.size());
   QPointF spawnPos = m_freeSpawnPoints[idx];
   int type = QRandomGenerator::global()->bounded(0, 3);
-  EnemyTank* enemy = nullptr;
+  std::unique_ptr<EnemyTank> uptr;
   if (type == 0) {
-    enemy = new LightEnemy(spawnPos.x(), spawnPos.y());
+    uptr = std::make_unique<LightEnemy>(spawnPos.x(), spawnPos.y());
   } else if (type == 1) {
-    enemy = new HeavyEnemy(spawnPos.x(), spawnPos.y());
+    uptr = std::make_unique<HeavyEnemy>(spawnPos.x(), spawnPos.y());
   } else {
-    enemy = new TwinShooterEnemy(spawnPos.x(), spawnPos.y());
+    uptr = std::make_unique<TwinShooterEnemy>(spawnPos.x(), spawnPos.y());
   }
-  m_enemyTanks.append(enemy);
+  EnemyTank* enemy = m_model->AddEnemyTank(std::move(uptr));
   addItem(enemy);
   m_enemySpawnCooldown = kSpawnCooldown;
 }
 
 void GameScane::UpdateEnemies() {
-  for (auto* enemy : m_enemyTanks) {
+  auto enemiesCopy = m_model->GetEnemyTanks();
+  for (auto* enemy : enemiesCopy) {
     enemy->Update();
     if (enemy->GetMoveCooldown() <= 0) {
       int r = QRandomGenerator::global()->bounded(0, 6);
@@ -314,7 +307,7 @@ void GameScane::UpdateEnemies() {
       auto bullets = enemy->Fire(fireDir);
       for (auto& b : bullets) {
         addItem(b.get());
-        m_enemyBullets.push_back(std::move(b));
+        m_model->AddEnemyBullet(std::move(b));
       }
       enemy->ResetFireTimer(QRandomGenerator::global()->bounded(120, 300));
     }
@@ -322,35 +315,34 @@ void GameScane::UpdateEnemies() {
 }
 
 void GameScane::UpdatePlayerBullets() {
-  for (int i = (int)m_bullets.size() - 1; i >= 0; --i) {
-    auto& bulletPtr = m_bullets[i];
-    Bullet* bullet = bulletPtr.get();
+  if (!m_model) return;
+  for (int i = (int)m_model->GetBulletsCount() - 1; i >= 0; --i) {
+    Bullet* bullet = m_model->GetBulletAt((size_t)i);
     bullet->Move();
     QRectF bulletRect = bullet->GetBoundingRect();
 
     if (!sceneRect().intersects(bulletRect)) {
       removeItem(bullet);
-      m_bullets.erase(m_bullets.begin() + i);
+      m_model->RemoveBullet(bullet);
       continue;
     }
 
     bool hitEnemy = false;
-    for (int j = (int)m_enemyTanks.size() - 1; j >= 0; --j) {
-      auto* enemy = m_enemyTanks[j];
+    for (int j = (int)m_model->GetEnemyTanksCount() - 1; j >= 0; --j) {
+      auto* enemy = m_model->GetEnemyTankAt((size_t)j);
       QRectF enemyRect = enemy->boundingRect().translated(enemy->pos());
       if (bulletRect.intersects(enemyRect)) {
         enemy->TakeDamage(1);
         removeItem(bullet);
-        m_bullets.erase(m_bullets.begin() + i);
+        m_model->RemoveBullet(bullet);
 
         if (enemy->IsDead()) {
           removeItem(enemy);
-          delete enemy;
-          m_enemyTanks.removeAt(j);
+          m_model->RemoveEnemyTank(enemy);
 
-          s_model->ModifyScore(1);
-          if (s_model->GetKills() >= kWinConditionKills) {
-            s_model->SetGameWon(true);
+          m_model->ModifyScore(1);
+          if (m_model->GetKills() >= kWinConditionKills) {
+            m_model->SetGameWon(true);
           }
         }
 
@@ -364,57 +356,54 @@ void GameScane::UpdatePlayerBullets() {
 
     if (IsCollidingWithSolidWall(bulletRect)) {
       removeItem(bullet);
-      m_bullets.erase(m_bullets.begin() + i);
+      m_model->RemoveBullet(bullet);
       continue;
     }
 
     if (auto* brick = FindCollidingBrickWall(bulletRect)) {
       removeItem(brick);
-      auto it = std::find_if(m_brickWalls.begin(), m_brickWalls.end(),
-                             [brick](const std::unique_ptr<BrickWall>& p) { return p.get() == brick; });
-      if (it != m_brickWalls.end()) m_brickWalls.erase(it);
+      m_model->RemoveBrick(brick);
       removeItem(bullet);
-      m_bullets.erase(m_bullets.begin() + i);
+      m_model->RemoveBullet(bullet);
       continue;
     }
   }
 }
 
 void GameScane::UpdateEnemyBullets() {
-  for (int i = (int)m_enemyBullets.size() - 1; i >= 0; --i) {
-    auto& bulletPtr = m_enemyBullets[i];
-    Bullet* bullet = bulletPtr.get();
+  if (!m_model) return;
+  for (int i = (int)m_model->GetEnemyBulletsCount() - 1; i >= 0; --i) {
+    Bullet* bullet = m_model->GetEnemyBulletAt((size_t)i);
     bullet->Move();
     QRectF bulletRect = bullet->GetBoundingRect();
 
     if (!sceneRect().intersects(bulletRect)) {
       removeItem(bullet);
-      m_enemyBullets.erase(m_enemyBullets.begin() + i);
+      m_model->RemoveEnemyBullet(bullet);
       continue;
     }
 
     if (IsCollidingWithSolidWall(bulletRect)) {
       removeItem(bullet);
-      m_enemyBullets.erase(m_enemyBullets.begin() + i);
+      m_model->RemoveEnemyBullet(bullet);
       continue;
     }
 
     if (auto* brick = FindCollidingBrickWall(bulletRect)) {
       removeItem(brick);
-      auto it = std::find_if(m_brickWalls.begin(), m_brickWalls.end(),
-                             [brick](const std::unique_ptr<BrickWall>& p) { return p.get() == brick; });
-      if (it != m_brickWalls.end()) m_brickWalls.erase(it);
+      m_model->RemoveBrick(brick);
       removeItem(bullet);
-      m_enemyBullets.erase(m_enemyBullets.begin() + i);
+      m_model->RemoveEnemyBullet(bullet);
       continue;
     }
 
-    if (!s_model->IsGameOver()) {
-      QRectF playerRect = m_playerTank->boundingRect().translated(m_playerTank->pos());
+    if (!m_model->IsGameOver()) {
+      auto* player = m_model->GetPlayer();
+      QRectF playerRect = player->boundingRect().translated(player->pos());
       if (bulletRect.intersects(playerRect)) {
         removeItem(bullet);
-        m_enemyBullets.erase(m_enemyBullets.begin() + i);
-        s_model->ModifyPlayerLives(-1);
+        m_model->RemoveEnemyBullet(bullet);
+        m_model->ModifyPlayerLives(-1);
         continue;
       }
     }
@@ -422,30 +411,30 @@ void GameScane::UpdateEnemyBullets() {
 }
 
 void GameScane::UpdateBonuses() {
-  if (m_bonuses.isEmpty() || !m_playerTank) return;
+  if (!m_model || !m_model->GetPlayer()) return;
 
-  QRectF playerRect = m_playerTank->boundingRect().translated(m_playerTank->pos());
+  auto* player = m_model->GetPlayer();
+  QRectF playerRect = player->boundingRect().translated(player->pos());
 
-  for (int i = m_bonuses.size() - 1; i >= 0; --i) {
-    auto* bonus = m_bonuses[i];
+  for (int i = (int)m_model->GetBonusesCount() - 1; i >= 0; --i) {
+    auto* bonus = m_model->GetBonusAt((size_t)i);
     if (!bonus) continue;
 
     QRectF bonusRect = bonus->boundingRect().translated(bonus->pos());
     if (playerRect.intersects(bonusRect)) {
       bonus->Apply(this);
       removeItem(bonus);
-      delete bonus;
-      m_bonuses.removeAt(i);
+      m_model->RemoveBonus(bonus);
     }
   }
 }
 
 void GameScane::ModifyPlayerLives(int delta) {
-  if (s_model) s_model->ModifyPlayerLives(delta);
+  if (m_model) m_model->ModifyPlayerLives(delta);
 }
 
 void GameScane::ModifyScore(int delta) {
-  if (s_model) s_model->ModifyScore(delta);
+  if (m_model) m_model->ModifyScore(delta);
 }
 
 void GameScane::keyPressEvent(QKeyEvent* event) {
@@ -453,7 +442,7 @@ void GameScane::keyPressEvent(QKeyEvent* event) {
     return;
   }
 
-  if ((s_model->IsGameOver() || s_model->IsGameWon()) &&
+  if ((m_model->IsGameOver() || m_model->IsGameWon()) &&
       (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)) {
     RestartGame();
     return;
@@ -461,7 +450,7 @@ void GameScane::keyPressEvent(QKeyEvent* event) {
 
   m_pressedKeys.insert(static_cast<Qt::Key>(event->key()));
 
-    if (event->key() == Qt::Key_Space && m_canFire && !s_model->IsGameOver()) {
+    if (event->key() == Qt::Key_Space && m_canFire && !m_model->IsGameOver()) {
     FireBullet();
     m_canFire = false;
     s_playerFireCooldown = kPlayerFireCooldownFrames;
@@ -479,8 +468,9 @@ void GameScane::keyReleaseEvent(QKeyEvent* event) {
 }
 
 bool GameScane::IsCollidingWithSolidWall(const QRectF& rect) const {
-  for (const auto& wallPtr : m_walls) {
-    const auto* wall = wallPtr.get();
+  if (!m_model) return false;
+  for (size_t i = 0; i < m_model->GetWallsCount(); ++i) {
+    const auto* wall = m_model->GetWallAt(i);
     if (wall->boundingRect().translated(wall->pos()).intersects(rect)) {
       return true;
     }
@@ -489,10 +479,11 @@ bool GameScane::IsCollidingWithSolidWall(const QRectF& rect) const {
 }
 
 BrickWall* GameScane::FindCollidingBrickWall(const QRectF& rect) const {
-  for (const auto& brickPtr : m_brickWalls) {
-    const auto* brick = brickPtr.get();
+  if (!m_model) return nullptr;
+  for (size_t i = 0; i < m_model->GetBricksCount(); ++i) {
+    BrickWall* brick = m_model->GetBrickAt(i);
     if (brick->boundingRect().translated(brick->pos()).intersects(rect)) {
-      return const_cast<BrickWall*>(brick);
+      return brick;
     }
   }
   return nullptr;
@@ -503,8 +494,9 @@ bool GameScane::IsCollidingWithAnyWall(const QRectF& rect) const {
 }
 
 void GameScane::FireBullet() {
-  QPointF tankPos = m_playerTank->pos();
-  Direction direction = m_playerTank->GetDirection();
+  auto* player = m_model->GetPlayer();
+  QPointF tankPos = player->pos();
+  Direction direction = player->GetDirection();
 
   constexpr qreal kTankHalf = 16.0;
   constexpr qreal kBulletHalf = 3.0;
@@ -534,7 +526,7 @@ void GameScane::FireBullet() {
   auto bullet = std::make_unique<Bullet>(tankPos.x() + offsetX, tankPos.y() + offsetY,
                             direction, BulletOwner::Player);
   addItem(bullet.get());
-  m_bullets.push_back(std::move(bullet));
+  m_model->AddBullet(std::move(bullet));
 }
 
 void GameScane::ShowGameOver() {
@@ -602,7 +594,7 @@ void GameScane::ShowWinScreen() {
 }
 
 void GameScane::UpdateLivesDisplay() {
-  int lives = s_model ? s_model->GetLives() : 0;
+  int lives = m_model ? m_model->GetLives() : 0;
   m_livesText->setPlainText(QString("Lives: %1").arg(lives));
   m_livesText->setDefaultTextColor(Qt::white);
   m_livesText->setFont(QFont("Arial", 16, QFont::Bold));
@@ -610,7 +602,7 @@ void GameScane::UpdateLivesDisplay() {
 }
 
 void GameScane::UpdateScoreDisplay() {
-  int kills = s_model ? s_model->GetKills() : 0;
+  int kills = m_model ? m_model->GetKills() : 0;
   m_scoreText->setPlainText(QString("Kills: %1").arg(kills));
   m_scoreText->setDefaultTextColor(Qt::yellow);
   m_scoreText->setFont(QFont("Arial", 16, QFont::Bold));
@@ -625,26 +617,23 @@ void GameScane::RestartGame() {
     container.clear();
   };
 
-  auto cleanupRaw = [this](auto& container) {
-    for (auto* item : container) {
-      removeItem(item);
-      delete item;
-    }
-    container.clear();
-  };
+  if (m_model) {
+    for (auto* b : m_model->GetBullets()) if (b) removeItem(b);
+    for (auto* b : m_model->GetEnemyBullets()) if (b) removeItem(b);
+    for (auto* w : m_model->GetWalls()) if (w) removeItem(w);
+    for (auto* br : m_model->GetBricks()) if (br) removeItem(br);
+    if (m_model->GetPlayer()) removeItem(m_model->GetPlayer());
+    for (auto* e : m_model->GetEnemyTanks()) if (e) removeItem(e);
+    for (auto* bo : m_model->GetBonuses()) if (bo) removeItem(bo);
 
-  auto cleanupBullets = cleanupUnique;
-  if (m_playerTank) {
-    removeItem(m_playerTank.get());
-    m_playerTank.reset();
+    m_model->ClearBullets();
+    m_model->ClearEnemyBullets();
+    m_model->ClearWalls();
+    m_model->ClearBricks();
+    m_model->ClearEnemyTanks();
+    m_model->ClearBonuses();
+    m_model->ClearPlayer();
   }
-
-  cleanupUnique(m_walls);
-  cleanupUnique(m_brickWalls);
-  cleanupBullets(m_bullets);
-  cleanupBullets(m_enemyBullets);
-  cleanupRaw(m_enemyTanks);
-  cleanupRaw(m_bonuses);
 
 
   auto cleanupOptional = [this](auto& ptr) {
@@ -670,8 +659,8 @@ void GameScane::RestartGame() {
   m_canFire = true;
   m_enemySpawnCooldown = kSpawnCooldown;
 
-  m_playerTank = std::make_unique<Tank>(kSceneWidth / 2, kSceneHeight / 2);
-  addItem(m_playerTank.get());
+  m_model->SetPlayer(std::make_unique<Tank>(kSceneWidth / 2, kSceneHeight / 2));
+  addItem(m_model->GetPlayer());
 
   InitializeLevel();
 
@@ -683,11 +672,11 @@ void GameScane::RestartGame() {
   m_scoreText->setZValue(10);
   addItem(m_scoreText);
 
-  if (s_model) {
-    s_model->SetLives(kInitialPlayerLives);
-    s_model->SetKills(0);
-    s_model->SetGameOver(false);
-    s_model->SetGameWon(false);
+  if (m_model) {
+    m_model->SetLives(kInitialPlayerLives);
+    m_model->SetKills(0);
+    m_model->SetGameOver(false);
+    m_model->SetGameWon(false);
   }
 
   UpdateLivesDisplay();

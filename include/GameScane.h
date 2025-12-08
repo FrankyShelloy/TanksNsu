@@ -66,13 +66,7 @@ class GameScane final : public QGraphicsScene {
   QSet<Qt::Key> m_pressedKeys;
 
 
-  std::unique_ptr<Tank> m_playerTank;
-  std::vector<std::unique_ptr<Wall>> m_walls;
-  std::vector<std::unique_ptr<BrickWall>> m_brickWalls;
-  std::vector<std::unique_ptr<Bullet>> m_bullets;
-  std::vector<std::unique_ptr<Bullet>> m_enemyBullets;
-  QList<EnemyTank*> m_enemyTanks;
-  QList<Bonus*> m_bonuses;
+  // Ownership moved to GameModel: player, walls, bricks, bullets, enemy bullets, enemies, bonuses
   QList<QPointF> m_freeSpawnPoints;
 
 
