@@ -25,6 +25,7 @@ public:
 
 private:
   void UpdatePixmap();
+  void DrawGun(QPainter& painter, int center, int gunLength) const;
 
   Direction m_direction { Direction::Up };
   static constexpr qreal kSpeed = 2.0;

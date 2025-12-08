@@ -1,6 +1,10 @@
 #pragma once
 #include <QGraphicsPixmapItem>
 #include <QList>
+#include <memory>
+#include <vector>
+
+class QPainter;
 #include "Tank.h"
 
 class Bullet;
@@ -15,62 +19,35 @@ public:
   Direction GetDirection() const { return m_direction; }
 
   void SetDirection(Direction dir);
-  void ResetMoveTimer(int frames) { m_moveCooldown = frames; }
-  void ResetFireTimer(int frames) { m_fireCooldown = frames; }
-  int GetMoveCooldown() const { return m_moveCooldown; }
-  int GetFireCooldown() const { return m_fireCooldown; }
+  void ResetMoveTimer(int frames) { moveCooldown = frames; }
+  void ResetFireTimer(int frames) { fireCooldown = frames; }
+  int GetMoveCooldown() const { return moveCooldown; }
+  int GetFireCooldown() const { return fireCooldown; }
+
+  virtual qreal GetSpeed() const { return Speed; }
+  virtual qreal GetWidth() const { return Width; }
+  virtual qreal GetHeight() const { return Height; }
 
   
-  static constexpr qreal kSpeed = 30.0;
-  static constexpr qreal kWidth = 32.0;
-  static constexpr qreal kHeight = 32.0;
-
-  
-  virtual qreal GetSpeed() const { return kSpeed; }
-  virtual qreal GetWidth() const { return kWidth; }
-  virtual qreal GetHeight() const { return kHeight; }
-
-  
-  int GetHP() const { return m_hp; }
+  int GetHP() const { return hp; }
   void TakeDamage(int dmg);
-  bool IsDead() const { return m_hp <= 0; }
+  bool IsDead() const { return hp <= 0; }
 
 
-  virtual QList<Bullet*> Fire(Direction dir);
+  virtual std::vector<std::unique_ptr<Bullet>> Fire(Direction dir);
+
+private:
+  static constexpr qreal Speed = 30.0;
+  static constexpr qreal Width = 32.0;
+  static constexpr qreal Height = 32.0;
 
 protected:
   virtual void UpdatePixmap();
+  void DrawGun(QPainter& painter, int center, int gunLength) const;
 
   Direction m_direction = Direction::Down;
-  int m_moveCooldown = 0;
-  int m_fireCooldown = 0;
-  int m_hp = 1; 
+  int moveCooldown = 0;
+  int fireCooldown = 0;
+  int hp = 1;
 };
 
-// Легкий 
-class LightEnemy : public EnemyTank {
-public:
-  explicit LightEnemy(qreal x, qreal y);
-  qreal GetSpeed() const override { return 1.5; }
-protected:
-  void UpdatePixmap() override;
-};
-
-// Тяжелый 
-class HeavyEnemy : public EnemyTank {
-public:
-  explicit HeavyEnemy(qreal x, qreal y);
-  qreal GetSpeed() const override { return 1; }
-protected:
-  void UpdatePixmap() override;
-};
-
-// Двупульный тяжелый
-class TwinShooterEnemy : public EnemyTank {
-public:
-  explicit TwinShooterEnemy(qreal x, qreal y);
-  qreal GetSpeed() const override { return 0.8; }
-protected:
-  void UpdatePixmap() override;
-  QList<Bullet*> Fire(Direction dir) override;
-};

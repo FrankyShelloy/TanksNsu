@@ -19,6 +19,9 @@ add_executable(TanksGame
         src/Bonus.cpp
         src/Tank.cpp
         src/EnemyTank.cpp
+        src/LightEnemy.cpp
+        src/HeavyEnemy.cpp
+        src/TwinShooterEnemy.cpp
         src/Wall.cpp
         src/BrickWall.cpp
         src/Bullet.cpp

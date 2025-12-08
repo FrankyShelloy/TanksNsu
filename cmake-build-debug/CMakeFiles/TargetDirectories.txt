@@ -1,0 +1,5 @@
+/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/CMakeFiles/TanksGame.dir
+/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/CMakeFiles/TanksGame_autogen_timestamp_deps.dir
+/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/CMakeFiles/TanksGame_autogen.dir

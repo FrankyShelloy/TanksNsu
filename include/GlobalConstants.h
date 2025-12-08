@@ -70,3 +70,11 @@ constexpr int kCollisionInset = 4;
 
 // Задержка между выстрелами 
 constexpr int kPlayerFireCooldownFrames = 18;
+
+// Цвета 
+#include <QColor>
+inline const QColor kSceneBackgroundColor = QColor(20, 40, 20);
+inline const QColor kTankBodyColor = QColor(50, 205, 50);
+inline const QColor kTankTrackColor = QColor(0, 100, 0);
+inline const QColor kTankTurretColor = QColor(34, 139, 34);
+

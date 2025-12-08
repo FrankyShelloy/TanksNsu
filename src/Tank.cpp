@@ -5,6 +5,23 @@
 
 #include "GlobalConstants.h"
 
+void Tank::DrawGun(QPainter& painter, int center, int gunLength) const {
+  switch (m_direction) {
+    case Direction::Up:
+      painter.drawLine(center, center, center, center - gunLength);
+      break;
+    case Direction::Down:
+      painter.drawLine(center, center, center, center + gunLength);
+      break;
+    case Direction::Left:
+      painter.drawLine(center, center, center - gunLength, center);
+      break;
+    case Direction::Right:
+      painter.drawLine(center, center, center + gunLength, center);
+      break;
+  }
+}
+
 Tank::Tank(qreal x, qreal y, QObject* )
     : m_direction(Direction::Up) {
   setPos(x, y);
@@ -77,33 +94,20 @@ void Tank::UpdatePixmap() {
 
 
   painter.fillRect(kTankBodyX, kTankBodyY, kTankBodyWidth, kTankBodyHeight,
-                   QColor(50, 205, 50));
+                   kTankBodyColor);
 
 
-  painter.fillRect(kTankTrackLeftX, 10, kTankTrackWidth, kTankTrackHeight, QColor(0, 100, 0));
-  painter.fillRect(kTankTrackRightX, 10, kTankTrackWidth, kTankTrackHeight, QColor(0, 100, 0));
+  painter.fillRect(kTankTrackLeftX, 10, kTankTrackWidth, kTankTrackHeight, kTankTrackColor);
+  painter.fillRect(kTankTrackRightX, 10, kTankTrackWidth, kTankTrackHeight, kTankTrackColor);
 
 
   painter.fillRect(kTankTurretX, kTankTurretY, kTankTurretSize, kTankTurretSize,
-                   QColor(34, 139, 34));
+                   kTankTurretColor);
 
 
   painter.setPen(QPen(Qt::black, 2));
   const int center = kTankGunCenter;
-  switch (m_direction) {
-    case Direction::Up:
-      painter.drawLine(center, center, center, center - kTankGunLength);
-      break;
-    case Direction::Down:
-      painter.drawLine(center, center, center, center + kTankGunLength);
-      break;
-    case Direction::Left:
-      painter.drawLine(center, center, center - kTankGunLength, center);
-      break;
-    case Direction::Right:
-      painter.drawLine(center, center, center + kTankGunLength, center);
-      break;
-  }
+  DrawGun(painter, center, kTankGunLength);
 
   painter.end();
   setPixmap(pixmap);

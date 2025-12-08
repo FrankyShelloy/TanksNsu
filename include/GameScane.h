@@ -6,8 +6,11 @@
 #include <QList>
 #include <QPointF>
 #include "GameModel.h"
+#include "Bullet.h"
 #include <QSet>
 #include <QTimer>
+#include <memory>
+#include <vector>
 
 class Tank;
 class Wall;
@@ -45,7 +48,7 @@ class GameScane final : public QGraphicsScene {
   void UpdateBonuses();
 
   bool IsCollidingWithSolidWall(const QRectF& rect) const;
-  BrickWall* IsCollidingWithBrickWall(const QRectF& rect) const;
+  BrickWall* FindCollidingBrickWall(const QRectF& rect) const;
   bool IsCollidingWithAnyWall(const QRectF& rect) const;
 
   void UpdateLivesDisplay();
@@ -65,8 +68,8 @@ class GameScane final : public QGraphicsScene {
   Tank* m_playerTank = nullptr;
   QList<Wall*> m_walls;
   QList<BrickWall*> m_brickWalls;
-  QList<Bullet*> m_bullets;
-  QList<Bullet*> m_enemyBullets;
+  std::vector<std::unique_ptr<Bullet>> m_bullets;
+  std::vector<std::unique_ptr<Bullet>> m_enemyBullets;
   QList<EnemyTank*> m_enemyTanks;
   QList<Bonus*> m_bonuses;
   QList<QPointF> m_freeSpawnPoints;

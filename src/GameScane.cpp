@@ -5,10 +5,15 @@
 #include <QRandomGenerator>
 #include <QTimer>
 #include <QGraphicsView>
+#include <memory>
+#include <vector>
 
 #include "BrickWall.h"
 #include "Bullet.h"
 #include "EnemyTank.h"
+#include "LightEnemy.h"
+#include "HeavyEnemy.h"
+#include "TwinShooterEnemy.h"
 #include "Tank.h"
 #include "Wall.h"
 #include "Bonus.h"
@@ -263,9 +268,9 @@ void GameScane::UpdateEnemies() {
       Direction fireDir = static_cast<Direction>(dirIdx);
 
       auto bullets = enemy->Fire(fireDir);
-      for (auto* b : bullets) {
-        m_enemyBullets.append(b);
-        addItem(b);
+      for (auto& b : bullets) {
+        addItem(b.get());
+        m_enemyBullets.push_back(std::move(b));
       }
       enemy->ResetFireTimer(QRandomGenerator::global()->bounded(120, 300));
     }
@@ -273,27 +278,26 @@ void GameScane::UpdateEnemies() {
 }
 
 void GameScane::UpdatePlayerBullets() {
-  for (int i = m_bullets.size() - 1; i >= 0; --i) {
-    auto* bullet = m_bullets[i];
+  for (int i = (int)m_bullets.size() - 1; i >= 0; --i) {
+    auto& bulletPtr = m_bullets[i];
+    Bullet* bullet = bulletPtr.get();
     bullet->Move();
     QRectF bulletRect = bullet->GetBoundingRect();
 
     if (!sceneRect().intersects(bulletRect)) {
       removeItem(bullet);
-      delete bullet;
-      m_bullets.removeAt(i);
+      m_bullets.erase(m_bullets.begin() + i);
       continue;
     }
 
     bool hitEnemy = false;
-    for (int j = m_enemyTanks.size() - 1; j >= 0; --j) {
+    for (int j = (int)m_enemyTanks.size() - 1; j >= 0; --j) {
       auto* enemy = m_enemyTanks[j];
       QRectF enemyRect = enemy->boundingRect().translated(enemy->pos());
       if (bulletRect.intersects(enemyRect)) {
         enemy->TakeDamage(1);
         removeItem(bullet);
-        delete bullet;
-        m_bullets.removeAt(i);
+        m_bullets.erase(m_bullets.begin() + i);
 
         if (enemy->IsDead()) {
           removeItem(enemy);
@@ -316,59 +320,54 @@ void GameScane::UpdatePlayerBullets() {
 
     if (IsCollidingWithSolidWall(bulletRect)) {
       removeItem(bullet);
-      delete bullet;
-      m_bullets.removeAt(i);
+      m_bullets.erase(m_bullets.begin() + i);
       continue;
     }
 
-    if (auto* brick = IsCollidingWithBrickWall(bulletRect)) {
+    if (auto* brick = FindCollidingBrickWall(bulletRect)) {
       removeItem(brick);
       delete brick;
       m_brickWalls.removeAll(brick);
       removeItem(bullet);
-      delete bullet;
-      m_bullets.removeAt(i);
+      m_bullets.erase(m_bullets.begin() + i);
       continue;
     }
   }
 }
 
 void GameScane::UpdateEnemyBullets() {
-  for (int i = m_enemyBullets.size() - 1; i >= 0; --i) {
-    auto* bullet = m_enemyBullets[i];
+  for (int i = (int)m_enemyBullets.size() - 1; i >= 0; --i) {
+    auto& bulletPtr = m_enemyBullets[i];
+    Bullet* bullet = bulletPtr.get();
     bullet->Move();
     QRectF bulletRect = bullet->GetBoundingRect();
 
     if (!sceneRect().intersects(bulletRect)) {
       removeItem(bullet);
-      delete bullet;
-      m_enemyBullets.removeAt(i);
+      m_enemyBullets.erase(m_enemyBullets.begin() + i);
       continue;
     }
 
     if (IsCollidingWithSolidWall(bulletRect)) {
       removeItem(bullet);
-      delete bullet;
-      m_enemyBullets.removeAt(i);
+      m_enemyBullets.erase(m_enemyBullets.begin() + i);
       continue;
     }
 
-    if (auto* brick = IsCollidingWithBrickWall(bulletRect)) {
+    if (auto* brick = FindCollidingBrickWall(bulletRect)) {
       removeItem(brick);
       delete brick;
       m_brickWalls.removeAll(brick);
       removeItem(bullet);
-      delete bullet;
-      m_enemyBullets.removeAt(i);
+      m_enemyBullets.erase(m_enemyBullets.begin() + i);
       continue;
     }
 
-  if (!s_model->IsGameOver()) {
+    if (!s_model->IsGameOver()) {
       QRectF playerRect = m_playerTank->boundingRect().translated(m_playerTank->pos());
       if (bulletRect.intersects(playerRect)) {
         removeItem(bullet);
-        delete bullet;
-        m_enemyBullets.removeAt(i);
+        m_enemyBullets.erase(m_enemyBullets.begin() + i);
         s_model->ModifyPlayerLives(-1);
         continue;
       }
@@ -442,7 +441,7 @@ bool GameScane::IsCollidingWithSolidWall(const QRectF& rect) const {
   return false;
 }
 
-BrickWall* GameScane::IsCollidingWithBrickWall(const QRectF& rect) const {
+BrickWall* GameScane::FindCollidingBrickWall(const QRectF& rect) const {
   for (auto* brick : m_brickWalls) {
     if (brick->boundingRect().translated(brick->pos()).intersects(rect)) {
       return brick;
@@ -452,7 +451,7 @@ BrickWall* GameScane::IsCollidingWithBrickWall(const QRectF& rect) const {
 }
 
 bool GameScane::IsCollidingWithAnyWall(const QRectF& rect) const {
-  return IsCollidingWithSolidWall(rect) || (IsCollidingWithBrickWall(rect) != nullptr);
+  return IsCollidingWithSolidWall(rect) || (FindCollidingBrickWall(rect) != nullptr);
 }
 
 void GameScane::FireBullet() {
@@ -484,10 +483,10 @@ void GameScane::FireBullet() {
       break;
   }
 
-  auto* bullet = new Bullet(tankPos.x() + offsetX, tankPos.y() + offsetY,
+  auto bullet = std::make_unique<Bullet>(tankPos.x() + offsetX, tankPos.y() + offsetY,
                             direction, BulletOwner::Player);
-  m_bullets.append(bullet);
-  addItem(bullet);
+  addItem(bullet.get());
+  m_bullets.push_back(std::move(bullet));
 }
 
 void GameScane::ShowGameOver() {
@@ -571,7 +570,7 @@ void GameScane::UpdateScoreDisplay() {
 }
 
 void GameScane::RestartGame() {
-  auto cleanup = [this](auto& container) {
+  auto cleanupRaw = [this](auto& container) {
     for (auto* item : container) {
       removeItem(item);
       delete item;
@@ -579,18 +578,24 @@ void GameScane::RestartGame() {
     container.clear();
   };
 
+  auto cleanupBullets = [this](auto& container) {
+    for (auto& uptr : container) {
+      if (uptr) removeItem(uptr.get());
+    }
+    container.clear();
+  };
   if (m_playerTank) {
     removeItem(m_playerTank);
     delete m_playerTank;
     m_playerTank = nullptr;
   }
 
-  cleanup(m_walls);
-  cleanup(m_brickWalls);
-  cleanup(m_bullets);
-  cleanup(m_enemyBullets);
-  cleanup(m_enemyTanks);
-  cleanup(m_bonuses);
+  cleanupRaw(m_walls);
+  cleanupRaw(m_brickWalls);
+  cleanupBullets(m_bullets);
+  cleanupBullets(m_enemyBullets);
+  cleanupRaw(m_enemyTanks);
+  cleanupRaw(m_bonuses);
 
 
   auto cleanupOptional = [this](auto& ptr) {
