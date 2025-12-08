@@ -61,7 +61,50 @@ GameScane::GameScane(QObject* parent)
   UpdateScoreDisplay();
 }
 
-GameScane::~GameScane() = default;
+GameScane::~GameScane() {
+  // Remove items that are owned by unique_ptr so QGraphicsScene won't try to delete them later
+  for (auto& up : m_bullets) if (up) removeItem(up.get());
+  for (auto& up : m_enemyBullets) if (up) removeItem(up.get());
+  for (auto& up : m_walls) if (up) removeItem(up.get());
+  for (auto& up : m_brickWalls) if (up) removeItem(up.get());
+  if (m_playerTank) removeItem(m_playerTank.get());
+
+  // Clean up raw-pointer containers: remove from scene and delete
+  for (auto* enemy : m_enemyTanks) {
+    if (enemy) {
+      removeItem(enemy);
+      delete enemy;
+    }
+  }
+  m_enemyTanks.clear();
+
+  for (auto* bonus : m_bonuses) {
+    if (bonus) {
+      removeItem(bonus);
+      delete bonus;
+    }
+  }
+  m_bonuses.clear();
+
+  // Remove optional graphics items
+  auto cleanupOptional = [this](auto*& ptr) {
+    if (ptr) {
+      removeItem(ptr);
+      delete ptr;
+      ptr = nullptr;
+    }
+  };
+  cleanupOptional(m_overlay);
+  cleanupOptional(m_gameOverBox);
+  cleanupOptional(m_gameOverText);
+  cleanupOptional(m_restartText);
+  cleanupOptional(m_winOverlay);
+  cleanupOptional(m_winBox);
+  cleanupOptional(m_winText);
+  cleanupOptional(m_winRestartText);
+  cleanupOptional(m_livesText);
+  cleanupOptional(m_scoreText);
+}
 
 void GameScane::InitializeLevel() {
   const char* levelMap[kMapRows] = {

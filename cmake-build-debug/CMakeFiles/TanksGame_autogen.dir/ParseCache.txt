@@ -697,5 +697,5 @@
 /home/frankyshelloy/CLionProjects/TankiGame/src/GameModel.cpp
 /home/frankyshelloy/CLionProjects/TankiGame/src/EnemyTank.cpp
 /home/frankyshelloy/CLionProjects/TankiGame/src/Bullet.cpp
-/home/frankyshelloy/CLionProjects/TankiGame/src/TwinShooterEnemy.cpp
 /home/frankyshelloy/CLionProjects/TankiGame/src/LightEnemy.cpp
+/home/frankyshelloy/CLionProjects/TankiGame/src/TwinShooterEnemy.cpp
