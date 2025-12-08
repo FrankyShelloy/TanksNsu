@@ -1,0 +1,80 @@
+[
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/TanksGame_autogen/mocs_compilation.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/mocs_compilation.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/mocs_compilation.cpp",
+  "output": "CMakeFiles/TanksGame.dir/TanksGame_autogen/mocs_compilation.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/main.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/main.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/main.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/GameScane.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/GameScane.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/GameScane.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/GameScane.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/GameModel.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/GameModel.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/GameModel.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/GameModel.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/Bonus.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/Bonus.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/Bonus.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/Bonus.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/Tank.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/Tank.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/Tank.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/Tank.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/EnemyTank.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/EnemyTank.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/EnemyTank.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/EnemyTank.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/LightEnemy.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/LightEnemy.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/LightEnemy.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/LightEnemy.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/HeavyEnemy.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/HeavyEnemy.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/HeavyEnemy.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/HeavyEnemy.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/TwinShooterEnemy.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/TwinShooterEnemy.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/TwinShooterEnemy.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/TwinShooterEnemy.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/Wall.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/Wall.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/Wall.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/Wall.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/BrickWall.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/BrickWall.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/BrickWall.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/BrickWall.cpp.o"
+},
+{
+  "directory": "/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug",
+  "command": "/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/include -I/home/frankyshelloy/CLionProjects/TankiGame/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtMultimedia -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -std=gnu++20 -fPIC -o CMakeFiles/TanksGame.dir/src/Bullet.cpp.o -c /home/frankyshelloy/CLionProjects/TankiGame/src/Bullet.cpp",
+  "file": "/home/frankyshelloy/CLionProjects/TankiGame/src/Bullet.cpp",
+  "output": "CMakeFiles/TanksGame.dir/src/Bullet.cpp.o"
+}
+]

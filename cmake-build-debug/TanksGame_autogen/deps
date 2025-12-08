@@ -3,9 +3,12 @@ TanksGame_autogen/timestamp: \
 	/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/CMakeFiles/3.31.6/CMakeCXXCompiler.cmake \
 	/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/CMakeFiles/3.31.6/CMakeSystem.cmake \
 	/home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/moc_predefs.h \
+	/home/frankyshelloy/CLionProjects/TankiGame/include/BrickWall.h \
 	/home/frankyshelloy/CLionProjects/TankiGame/include/Bullet.h \
 	/home/frankyshelloy/CLionProjects/TankiGame/include/GameModel.h \
 	/home/frankyshelloy/CLionProjects/TankiGame/include/GameScane.h \
+	/home/frankyshelloy/CLionProjects/TankiGame/include/Tank.h \
+	/home/frankyshelloy/CLionProjects/TankiGame/include/Wall.h \
 	/home/frankyshelloy/CLionProjects/TankiGame/src/Bonus.cpp \
 	/home/frankyshelloy/CLionProjects/TankiGame/src/BrickWall.cpp \
 	/home/frankyshelloy/CLionProjects/TankiGame/src/Bullet.cpp \
@@ -349,6 +352,7 @@ TanksGame_autogen/timestamp: \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/QKeyEvent \
+	/usr/include/x86_64-linux-gnu/qt5/QtGui/QPixmap \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qbrush.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qcolor.h \
 	/usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h \

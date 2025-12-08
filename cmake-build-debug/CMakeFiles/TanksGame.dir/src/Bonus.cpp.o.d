@@ -359,6 +359,11 @@ CMakeFiles/TanksGame.dir/src/Bonus.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qobject.h \
  /home/frankyshelloy/CLionProjects/TankiGame/include/Bullet.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QGraphicsPixmapItem \
+ /home/frankyshelloy/CLionProjects/TankiGame/include/Tank.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QPixmap \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qpixmap.h \
+ /home/frankyshelloy/CLionProjects/TankiGame/include/Wall.h \
+ /home/frankyshelloy/CLionProjects/TankiGame/include/BrickWall.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QSet \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qset.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer \

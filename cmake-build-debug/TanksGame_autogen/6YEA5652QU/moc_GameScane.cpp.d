@@ -1,7 +1,10 @@
 /home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/6YEA5652QU/moc_GameScane.cpp: /home/frankyshelloy/CLionProjects/TankiGame/include/GameScane.h \
   /home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/moc_predefs.h \
+  /home/frankyshelloy/CLionProjects/TankiGame/include/BrickWall.h \
   /home/frankyshelloy/CLionProjects/TankiGame/include/Bullet.h \
   /home/frankyshelloy/CLionProjects/TankiGame/include/GameModel.h \
+  /home/frankyshelloy/CLionProjects/TankiGame/include/Tank.h \
+  /home/frankyshelloy/CLionProjects/TankiGame/include/Wall.h \
   /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
@@ -333,6 +336,7 @@
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/QKeyEvent \
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/QPixmap \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qbrush.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qcolor.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h \

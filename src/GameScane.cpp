@@ -7,6 +7,7 @@
 #include <QGraphicsView>
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 #include "BrickWall.h"
 #include "Bullet.h"
@@ -32,8 +33,8 @@ GameScane::GameScane(QObject* parent)
   setSceneRect(0, 0, kSceneWidth, kSceneHeight);
   setBackgroundBrush(QColor(20, 40, 20));
 
-  m_playerTank = new Tank(kSceneWidth / 2, kSceneHeight / 2);
-  addItem(m_playerTank);
+  m_playerTank = std::make_unique<Tank>(kSceneWidth / 2, kSceneHeight / 2);
+  addItem(m_playerTank.get());
 
   m_livesText = new QGraphicsTextItem();
   m_livesText->setZValue(10);
@@ -59,6 +60,8 @@ GameScane::GameScane(QObject* parent)
   UpdateLivesDisplay();
   UpdateScoreDisplay();
 }
+
+GameScane::~GameScane() = default;
 
 void GameScane::InitializeLevel() {
   const char* levelMap[kMapRows] = {
@@ -91,13 +94,11 @@ void GameScane::InitializeLevel() {
       qreal posY = y * kTileSize;
 
       if (cell == 'W') {
-        auto* wall = new Wall(posX, posY);
-        m_walls.append(wall);
-        addItem(wall);
+        m_walls.emplace_back(std::make_unique<Wall>(posX, posY));
+        addItem(m_walls.back().get());
       } else if (cell == 'B') {
-        auto* brick = new BrickWall(posX, posY);
-        m_brickWalls.append(brick);
-        addItem(brick);
+        m_brickWalls.emplace_back(std::make_unique<BrickWall>(posX, posY));
+        addItem(m_brickWalls.back().get());
       } else if (cell == ' ') {
         m_freeSpawnPoints.append(QPointF(posX, posY));
       }
@@ -326,8 +327,9 @@ void GameScane::UpdatePlayerBullets() {
 
     if (auto* brick = FindCollidingBrickWall(bulletRect)) {
       removeItem(brick);
-      delete brick;
-      m_brickWalls.removeAll(brick);
+      auto it = std::find_if(m_brickWalls.begin(), m_brickWalls.end(),
+                             [brick](const std::unique_ptr<BrickWall>& p) { return p.get() == brick; });
+      if (it != m_brickWalls.end()) m_brickWalls.erase(it);
       removeItem(bullet);
       m_bullets.erase(m_bullets.begin() + i);
       continue;
@@ -356,8 +358,9 @@ void GameScane::UpdateEnemyBullets() {
 
     if (auto* brick = FindCollidingBrickWall(bulletRect)) {
       removeItem(brick);
-      delete brick;
-      m_brickWalls.removeAll(brick);
+      auto it = std::find_if(m_brickWalls.begin(), m_brickWalls.end(),
+                             [brick](const std::unique_ptr<BrickWall>& p) { return p.get() == brick; });
+      if (it != m_brickWalls.end()) m_brickWalls.erase(it);
       removeItem(bullet);
       m_enemyBullets.erase(m_enemyBullets.begin() + i);
       continue;
@@ -433,7 +436,8 @@ void GameScane::keyReleaseEvent(QKeyEvent* event) {
 }
 
 bool GameScane::IsCollidingWithSolidWall(const QRectF& rect) const {
-  for (const auto* wall : m_walls) {
+  for (const auto& wallPtr : m_walls) {
+    const auto* wall = wallPtr.get();
     if (wall->boundingRect().translated(wall->pos()).intersects(rect)) {
       return true;
     }
@@ -442,9 +446,10 @@ bool GameScane::IsCollidingWithSolidWall(const QRectF& rect) const {
 }
 
 BrickWall* GameScane::FindCollidingBrickWall(const QRectF& rect) const {
-  for (auto* brick : m_brickWalls) {
+  for (const auto& brickPtr : m_brickWalls) {
+    const auto* brick = brickPtr.get();
     if (brick->boundingRect().translated(brick->pos()).intersects(rect)) {
-      return brick;
+      return const_cast<BrickWall*>(brick);
     }
   }
   return nullptr;
@@ -570,6 +575,13 @@ void GameScane::UpdateScoreDisplay() {
 }
 
 void GameScane::RestartGame() {
+  auto cleanupUnique = [this](auto& container) {
+    for (auto& uptr : container) {
+      if (uptr) removeItem(uptr.get());
+    }
+    container.clear();
+  };
+
   auto cleanupRaw = [this](auto& container) {
     for (auto* item : container) {
       removeItem(item);
@@ -578,20 +590,14 @@ void GameScane::RestartGame() {
     container.clear();
   };
 
-  auto cleanupBullets = [this](auto& container) {
-    for (auto& uptr : container) {
-      if (uptr) removeItem(uptr.get());
-    }
-    container.clear();
-  };
+  auto cleanupBullets = cleanupUnique;
   if (m_playerTank) {
-    removeItem(m_playerTank);
-    delete m_playerTank;
-    m_playerTank = nullptr;
+    removeItem(m_playerTank.get());
+    m_playerTank.reset();
   }
 
-  cleanupRaw(m_walls);
-  cleanupRaw(m_brickWalls);
+  cleanupUnique(m_walls);
+  cleanupUnique(m_brickWalls);
   cleanupBullets(m_bullets);
   cleanupBullets(m_enemyBullets);
   cleanupRaw(m_enemyTanks);
@@ -621,8 +627,8 @@ void GameScane::RestartGame() {
   m_canFire = true;
   m_enemySpawnCooldown = kSpawnCooldown;
 
-  m_playerTank = new Tank(kSceneWidth / 2, kSceneHeight / 2);
-  addItem(m_playerTank);
+  m_playerTank = std::make_unique<Tank>(kSceneWidth / 2, kSceneHeight / 2);
+  addItem(m_playerTank.get());
 
   InitializeLevel();
 

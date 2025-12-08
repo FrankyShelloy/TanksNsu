@@ -7,14 +7,14 @@
 #include <QPointF>
 #include "GameModel.h"
 #include "Bullet.h"
+#include "Tank.h"
+#include "Wall.h"
+#include "BrickWall.h"
 #include <QSet>
 #include <QTimer>
 #include <memory>
 #include <vector>
 
-class Tank;
-class Wall;
-class BrickWall;
 class Bullet;
 class EnemyTank;
 class Bonus;
@@ -24,6 +24,7 @@ class GameScane final : public QGraphicsScene {
 
  public:
   explicit GameScane(QObject* parent = nullptr);
+  ~GameScane();
   void ModifyPlayerLives(int delta);
   void ModifyScore(int delta);
 
@@ -65,9 +66,9 @@ class GameScane final : public QGraphicsScene {
   QSet<Qt::Key> m_pressedKeys;
 
 
-  Tank* m_playerTank = nullptr;
-  QList<Wall*> m_walls;
-  QList<BrickWall*> m_brickWalls;
+  std::unique_ptr<Tank> m_playerTank;
+  std::vector<std::unique_ptr<Wall>> m_walls;
+  std::vector<std::unique_ptr<BrickWall>> m_brickWalls;
   std::vector<std::unique_ptr<Bullet>> m_bullets;
   std::vector<std::unique_ptr<Bullet>> m_enemyBullets;
   QList<EnemyTank*> m_enemyTanks;

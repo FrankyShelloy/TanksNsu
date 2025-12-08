@@ -355,6 +355,11 @@ CMakeFiles/TanksGame.dir/TanksGame_autogen/mocs_compilation.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qpoint.h \
  /home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/6YEA5652QU/../../../include/Bullet.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QGraphicsPixmapItem \
+ /home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/6YEA5652QU/../../../include/Tank.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QPixmap \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qpixmap.h \
+ /home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/6YEA5652QU/../../../include/Wall.h \
+ /home/frankyshelloy/CLionProjects/TankiGame/cmake-build-debug/TanksGame_autogen/6YEA5652QU/../../../include/BrickWall.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QSet \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qset.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer \
