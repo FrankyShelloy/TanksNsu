@@ -20,6 +20,7 @@
 #include "Bonus.h"
 
 #include "GameModel.h"
+#include "InputController.h"
 
 #include "GlobalConstants.h"
 
@@ -58,6 +59,16 @@ GameScane::GameScane(QObject* parent)
   connect(m_model, &GameModel::gameWon, this, &GameScane::ShowWinScreen);
   UpdateLivesDisplay();
   UpdateScoreDisplay();
+
+  m_inputController = new InputController(m_model, this);
+  connect(m_inputController, &InputController::restartRequested, this, &GameScane::RestartGame);
+  connect(m_inputController, &InputController::fireRequested, this, [this]() {
+    if (m_canFire && !m_model->IsGameOver()) {
+      FireBullet();
+      m_canFire = false;
+      s_playerFireCooldown = kPlayerFireCooldownFrames;
+    }
+  });
 }
 
 GameScane::~GameScane() {
@@ -182,16 +193,16 @@ void GameScane::HandlePlayerInputAndMovement() {
   Direction desiredDirection = player->GetDirection();
   bool shouldMove = false;
 
-  if (m_pressedKeys.contains(Qt::Key_Left)) {
+  if (m_inputController && m_inputController->IsKeyPressed(Qt::Key_Left)) {
     desiredDirection = Direction::Left;
     shouldMove = true;
-  } else if (m_pressedKeys.contains(Qt::Key_Right)) {
+  } else if (m_inputController && m_inputController->IsKeyPressed(Qt::Key_Right)) {
     desiredDirection = Direction::Right;
     shouldMove = true;
-  } else if (m_pressedKeys.contains(Qt::Key_Up)) {
+  } else if (m_inputController && m_inputController->IsKeyPressed(Qt::Key_Up)) {
     desiredDirection = Direction::Up;
     shouldMove = true;
-  } else if (m_pressedKeys.contains(Qt::Key_Down)) {
+  } else if (m_inputController && m_inputController->IsKeyPressed(Qt::Key_Down)) {
     desiredDirection = Direction::Down;
     shouldMove = true;
   }
@@ -438,32 +449,12 @@ void GameScane::ModifyScore(int delta) {
 }
 
 void GameScane::keyPressEvent(QKeyEvent* event) {
-  if (event->isAutoRepeat()) {
-    return;
-  }
-
-  if ((m_model->IsGameOver() || m_model->IsGameWon()) &&
-      (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)) {
-    RestartGame();
-    return;
-  }
-
-  m_pressedKeys.insert(static_cast<Qt::Key>(event->key()));
-
-    if (event->key() == Qt::Key_Space && m_canFire && !m_model->IsGameOver()) {
-    FireBullet();
-    m_canFire = false;
-    s_playerFireCooldown = kPlayerFireCooldownFrames;
-  }
-
+  if (m_inputController) m_inputController->HandleKeyPress(event);
   QGraphicsScene::keyPressEvent(event);
 }
 
 void GameScane::keyReleaseEvent(QKeyEvent* event) {
-  if (event->isAutoRepeat()) {
-    return;
-  }
-  m_pressedKeys.remove(static_cast<Qt::Key>(event->key()));
+  if (m_inputController) m_inputController->HandleKeyRelease(event);
   QGraphicsScene::keyReleaseEvent(event);
 }
 

@@ -18,6 +18,7 @@
 class Bullet;
 class EnemyTank;
 class Bonus;
+class InputController;
 
 class GameScane final : public QGraphicsScene {
   Q_OBJECT
@@ -63,10 +64,8 @@ class GameScane final : public QGraphicsScene {
 
 
   QTimer m_gameTimer;
-  QSet<Qt::Key> m_pressedKeys;
+  InputController* m_inputController = nullptr;
 
-
-  // Ownership moved to GameModel: player, walls, bricks, bullets, enemy bullets, enemies, bonuses
   QList<QPointF> m_freeSpawnPoints;
 
 

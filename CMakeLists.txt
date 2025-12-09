@@ -14,8 +14,10 @@ add_executable(TanksGame
         src/main.cpp
         src/GameScane.cpp
         src/GameModel.cpp
+        src/InputController.cpp
         include/GameScane.h
         include/GameModel.h
+        include/InputController.h
         src/Bonus.cpp
         src/Tank.cpp
         src/EnemyTank.cpp
