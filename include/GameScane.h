@@ -10,6 +10,8 @@
 #include "Tank.h"
 #include "Wall.h"
 #include "BrickWall.h"
+#include <string>
+#include "Factory.hpp"
 #include <QSet>
 #include <QTimer>
 #include <memory>
@@ -60,6 +62,7 @@ class GameScane final : public QGraphicsScene {
   void ShowWinScreen();
 
   GameModel* m_model = nullptr;
+  Factory<EnemyTank, std::string> m_enemyFactory;
   bool m_canFire = true;
   int m_enemySpawnCooldown = 0;
 

@@ -72,6 +72,11 @@ GameScane::GameScane(QObject* parent)
       s_playerFireCooldown = kPlayerFireCooldownFrames;
     }
   });
+
+  m_enemyFactory.Register("light", []() -> EnemyTank* { return new LightEnemy(0.0, 0.0); });
+  m_enemyFactory.Register("heavy", []() -> EnemyTank* { return new HeavyEnemy(0.0, 0.0); });
+  m_enemyFactory.Register("twin", []() -> EnemyTank* { return new TwinShooterEnemy(0.0, 0.0); });
+  m_enemyFactory.Register("kamikaze", []() -> EnemyTank* { return new KamikazeEnemy(0.0, 0.0); });
 }
 
 GameScane::~GameScane() {
@@ -241,18 +246,27 @@ void GameScane::SpawnEnemiesIfNeeded() {
   QPointF spawnPos = m_freeSpawnPoints[idx];
   int type = QRandomGenerator::global()->bounded(0, 4);
   std::unique_ptr<EnemyTank> uptr;
-  if (type == 0) {
-    uptr = std::make_unique<LightEnemy>(spawnPos.x(), spawnPos.y());
-  } else if (type == 1) {
-    uptr = std::make_unique<HeavyEnemy>(spawnPos.x(), spawnPos.y());
-  } else if (type == 2) {
-    uptr = std::make_unique<TwinShooterEnemy>(spawnPos.x(), spawnPos.y());
-  } else {
-    uptr = std::make_unique<KamikazeEnemy>(spawnPos.x(), spawnPos.y());
+  switch (type) {
+    case 0:
+      uptr.reset(m_enemyFactory.CreateObject("light"));
+      break;
+    case 1:
+      uptr.reset(m_enemyFactory.CreateObject("heavy"));
+      break;
+    case 2:
+      uptr.reset(m_enemyFactory.CreateObject("twin"));
+      break;
+    default:
+      uptr.reset(m_enemyFactory.CreateObject("kamikaze"));
+      break;
   }
-  EnemyTank* enemy = m_model->AddEnemyTank(std::move(uptr));
-  addItem(enemy);
-  m_enemySpawnCooldown = kSpawnCooldown;
+
+  if (uptr) {
+    uptr->setPos(spawnPos);
+    EnemyTank* enemy = m_model->AddEnemyTank(std::move(uptr));
+    addItem(enemy);
+    m_enemySpawnCooldown = kSpawnCooldown;
+  }
 }
 
 void GameScane::UpdateEnemies() {
