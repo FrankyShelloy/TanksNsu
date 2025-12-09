@@ -19,6 +19,7 @@ class Bullet;
 class EnemyTank;
 class Bonus;
 class InputController;
+class TankView;
 
 class GameScane final : public QGraphicsScene {
   Q_OBJECT
@@ -77,6 +78,8 @@ class GameScane final : public QGraphicsScene {
   QGraphicsRectItem* m_gameOverBox = nullptr;
   QGraphicsTextItem* m_gameOverText = nullptr;
   QGraphicsTextItem* m_restartText = nullptr;
+
+  TankView* m_playerView = nullptr;
 
 
   QGraphicsRectItem* m_winOverlay = nullptr;

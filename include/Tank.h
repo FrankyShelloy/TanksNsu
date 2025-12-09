@@ -1,7 +1,10 @@
 #pragma once
 
-#include <QGraphicsPixmapItem>
-#include <QPixmap>
+#include <QPointF>
+#include <QRectF>
+#include <memory>
+
+#include "TankModel.h"
 
 enum class Direction
 {
@@ -11,10 +14,14 @@ enum class Direction
   Right
 };
 
-class Tank final : public QGraphicsPixmapItem
+class Tank final
 {
 public:
-  explicit Tank(qreal x, qreal y, QObject* parent = nullptr);
+  explicit Tank(qreal x, qreal y);
+
+  TankModel* GetModel() const { return m_model.get(); }
+  QPointF GetPosition() const { return m_pos; }
+  void SetPosition(const QPointF& p) { m_pos = p; }
 
   void SetDirection(Direction direction);
   void Update();
@@ -24,9 +31,9 @@ public:
 
 
 private:
-  void UpdatePixmap();
-  void DrawGun(QPainter& painter, int center, int gunLength) const;
-
   Direction m_direction { Direction::Up };
   static constexpr qreal kSpeed = 2.0;
+
+  QPointF m_pos{0,0};
+  std::unique_ptr<TankModel> m_model;
 };

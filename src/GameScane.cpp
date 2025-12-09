@@ -16,6 +16,7 @@
 #include "HeavyEnemy.h"
 #include "TwinShooterEnemy.h"
 #include "Tank.h"
+#include "TankView.h"
 #include "Wall.h"
 #include "Bonus.h"
 
@@ -37,7 +38,8 @@ GameScane::GameScane(QObject* parent)
   m_model->SetLives(kInitialPlayerLives);
   m_model->SetKills(0);
   m_model->SetPlayer(std::make_unique<Tank>(kSceneWidth / 2, kSceneHeight / 2));
-  addItem(m_model->GetPlayer());
+  m_playerView = new TankView(m_model->GetPlayer());
+  addItem(m_playerView);
 
   m_livesText = new QGraphicsTextItem();
   m_livesText->setZValue(10);
@@ -77,7 +79,7 @@ GameScane::~GameScane() {
     for (auto* b : m_model->GetEnemyBullets()) if (b) removeItem(b);
     for (auto* w : m_model->GetWalls()) if (w) removeItem(w);
     for (auto* br : m_model->GetBricks()) if (br) removeItem(br);
-    if (m_model->GetPlayer()) removeItem(m_model->GetPlayer());
+    if (m_playerView) removeItem(m_playerView);
 
     for (auto* e : m_model->GetEnemyTanks()) if (e) removeItem(e);
     for (auto* bo : m_model->GetBonuses()) if (bo) removeItem(bo);
@@ -108,6 +110,7 @@ GameScane::~GameScane() {
   cleanupOptional(m_winRestartText);
   cleanupOptional(m_livesText);
   cleanupOptional(m_scoreText);
+  if (m_playerView) { removeItem(m_playerView); delete m_playerView; m_playerView = nullptr; }
   delete m_model;
 }
 
@@ -213,7 +216,11 @@ void GameScane::HandlePlayerInputAndMovement() {
     QRectF futureRect = player->GetFutureRect(desiredDirection);
     if (!IsCollidingWithAnyWall(futureRect)) {
       player->Move();
+      if (m_playerView) m_playerView->UpdateView();
     }
+  }
+  else {
+    if (m_playerView) m_playerView->UpdateView();
   }
 
   player->Update();
@@ -409,13 +416,14 @@ void GameScane::UpdateEnemyBullets() {
     }
 
     if (!m_model->IsGameOver()) {
-      auto* player = m_model->GetPlayer();
-      QRectF playerRect = player->boundingRect().translated(player->pos());
-      if (bulletRect.intersects(playerRect)) {
-        removeItem(bullet);
-        m_model->RemoveEnemyBullet(bullet);
-        m_model->ModifyPlayerLives(-1);
-        continue;
+      if (m_playerView) {
+        QRectF playerRect = m_playerView->boundingRect().translated(m_playerView->pos());
+        if (bulletRect.intersects(playerRect)) {
+          removeItem(bullet);
+          m_model->RemoveEnemyBullet(bullet);
+          m_model->ModifyPlayerLives(-1);
+          continue;
+        }
       }
     }
   }
@@ -424,8 +432,8 @@ void GameScane::UpdateEnemyBullets() {
 void GameScane::UpdateBonuses() {
   if (!m_model || !m_model->GetPlayer()) return;
 
-  auto* player = m_model->GetPlayer();
-  QRectF playerRect = player->boundingRect().translated(player->pos());
+  if (!m_playerView) return;
+  QRectF playerRect = m_playerView->boundingRect().translated(m_playerView->pos());
 
   for (int i = (int)m_model->GetBonusesCount() - 1; i >= 0; --i) {
     auto* bonus = m_model->GetBonusAt((size_t)i);
@@ -486,7 +494,7 @@ bool GameScane::IsCollidingWithAnyWall(const QRectF& rect) const {
 
 void GameScane::FireBullet() {
   auto* player = m_model->GetPlayer();
-  QPointF tankPos = player->pos();
+  QPointF tankPos = player->GetPosition();
   Direction direction = player->GetDirection();
 
   constexpr qreal kTankHalf = 16.0;
@@ -613,7 +621,7 @@ void GameScane::RestartGame() {
     for (auto* b : m_model->GetEnemyBullets()) if (b) removeItem(b);
     for (auto* w : m_model->GetWalls()) if (w) removeItem(w);
     for (auto* br : m_model->GetBricks()) if (br) removeItem(br);
-    if (m_model->GetPlayer()) removeItem(m_model->GetPlayer());
+    if (m_playerView) { removeItem(m_playerView); delete m_playerView; m_playerView = nullptr; }
     for (auto* e : m_model->GetEnemyTanks()) if (e) removeItem(e);
     for (auto* bo : m_model->GetBonuses()) if (bo) removeItem(bo);
 
@@ -651,7 +659,8 @@ void GameScane::RestartGame() {
   m_enemySpawnCooldown = kSpawnCooldown;
 
   m_model->SetPlayer(std::make_unique<Tank>(kSceneWidth / 2, kSceneHeight / 2));
-  addItem(m_model->GetPlayer());
+  m_playerView = new TankView(m_model->GetPlayer());
+  addItem(m_playerView);
 
   InitializeLevel();
 

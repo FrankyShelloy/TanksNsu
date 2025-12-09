@@ -20,6 +20,7 @@ add_executable(TanksGame
         include/InputController.h
         src/Bonus.cpp
         src/Tank.cpp
+        src/TankView.cpp
         src/EnemyTank.cpp
         src/LightEnemy.cpp
         src/HeavyEnemy.cpp
@@ -27,6 +28,7 @@ add_executable(TanksGame
         src/Wall.cpp
         src/BrickWall.cpp
         src/Bullet.cpp
+        include/TankView.h
 )
 
 target_link_libraries(TanksGame PRIVATE
