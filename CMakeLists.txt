@@ -22,6 +22,7 @@ add_executable(TanksGame
         src/Tank.cpp
         src/TankView.cpp
         src/EnemyTank.cpp
+        src/KamikazeEnemy.cpp
         src/LightEnemy.cpp
         src/HeavyEnemy.cpp
         src/TwinShooterEnemy.cpp

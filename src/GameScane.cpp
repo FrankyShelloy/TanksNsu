@@ -16,6 +16,7 @@
 #include "HeavyEnemy.h"
 #include "TwinShooterEnemy.h"
 #include "Tank.h"
+#include "KamikazeEnemy.h"
 #include "TankView.h"
 #include "Wall.h"
 #include "Bonus.h"
@@ -238,14 +239,16 @@ void GameScane::SpawnEnemiesIfNeeded() {
 
   int idx = QRandomGenerator::global()->bounded(m_freeSpawnPoints.size());
   QPointF spawnPos = m_freeSpawnPoints[idx];
-  int type = QRandomGenerator::global()->bounded(0, 3);
+  int type = QRandomGenerator::global()->bounded(0, 4);
   std::unique_ptr<EnemyTank> uptr;
   if (type == 0) {
     uptr = std::make_unique<LightEnemy>(spawnPos.x(), spawnPos.y());
   } else if (type == 1) {
     uptr = std::make_unique<HeavyEnemy>(spawnPos.x(), spawnPos.y());
-  } else {
+  } else if (type == 2) {
     uptr = std::make_unique<TwinShooterEnemy>(spawnPos.x(), spawnPos.y());
+  } else {
+    uptr = std::make_unique<KamikazeEnemy>(spawnPos.x(), spawnPos.y());
   }
   EnemyTank* enemy = m_model->AddEnemyTank(std::move(uptr));
   addItem(enemy);
@@ -314,6 +317,20 @@ void GameScane::UpdateEnemies() {
               break;
           }
           moved = true;
+        }
+      }
+    }
+
+    if (m_playerView) {
+      auto* k = dynamic_cast<KamikazeEnemy*>(enemy);
+      if (k) {
+        QRectF playerRect = m_playerView->boundingRect().translated(m_playerView->pos());
+        QRectF enemyRect = enemy->boundingRect().translated(enemy->pos());
+        if (playerRect.intersects(enemyRect)) {
+          removeItem(enemy);
+          m_model->RemoveEnemyTank(enemy);
+          m_model->ModifyPlayerLives(-1);
+          continue;
         }
       }
     }
