@@ -30,6 +30,7 @@ add_executable(TanksGame
         src/BrickWall.cpp
         src/Bullet.cpp
         include/TankView.h
+        include/GameScane.h
 )
 
 target_link_libraries(TanksGame PRIVATE

@@ -73,10 +73,10 @@ GameScane::GameScane(QObject* parent)
     }
   });
 
-  m_enemyFactory.Register("light", []() -> EnemyTank* { return new LightEnemy(0.0, 0.0); });
-  m_enemyFactory.Register("heavy", []() -> EnemyTank* { return new HeavyEnemy(0.0, 0.0); });
-  m_enemyFactory.Register("twin", []() -> EnemyTank* { return new TwinShooterEnemy(0.0, 0.0); });
-  m_enemyFactory.Register("kamikaze", []() -> EnemyTank* { return new KamikazeEnemy(0.0, 0.0); });
+  m_enemyFactory.Register("light", []() -> std::unique_ptr<EnemyTank> { return std::make_unique<LightEnemy>(0.0, 0.0); });
+  m_enemyFactory.Register("heavy", []() -> std::unique_ptr<EnemyTank> { return std::make_unique<HeavyEnemy>(0.0, 0.0); });
+  m_enemyFactory.Register("twin", []() -> std::unique_ptr<EnemyTank> { return std::make_unique<TwinShooterEnemy>(0.0, 0.0); });
+  m_enemyFactory.Register("kamikaze", []() -> std::unique_ptr<EnemyTank> { return std::make_unique<KamikazeEnemy>(0.0, 0.0); });
 }
 
 GameScane::~GameScane() {
@@ -248,16 +248,16 @@ void GameScane::SpawnEnemiesIfNeeded() {
   std::unique_ptr<EnemyTank> uptr;
   switch (type) {
     case 0:
-      uptr.reset(m_enemyFactory.CreateObject("light"));
+      uptr = m_enemyFactory.CreateObject("light");
       break;
     case 1:
-      uptr.reset(m_enemyFactory.CreateObject("heavy"));
+      uptr = m_enemyFactory.CreateObject("heavy");
       break;
     case 2:
-      uptr.reset(m_enemyFactory.CreateObject("twin"));
+      uptr = m_enemyFactory.CreateObject("twin");
       break;
     default:
-      uptr.reset(m_enemyFactory.CreateObject("kamikaze"));
+      uptr = m_enemyFactory.CreateObject("kamikaze");
       break;
   }
 
