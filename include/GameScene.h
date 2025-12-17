@@ -23,18 +23,20 @@ class Bonus;
 class InputController;
 class TankView;
 
-class GameScane final : public QGraphicsScene {
+class GameScene final : public QGraphicsScene {
   Q_OBJECT
 
  public:
-  explicit GameScane(QObject* parent = nullptr);
-  ~GameScane();
+  explicit GameScene(QObject* parent = nullptr);
+  ~GameScene();
   void ModifyPlayerLives(int delta);
   void ModifyScore(int delta);
 
  private slots:
   void Update();
 
+
+  void SetLivesTextStyle();
  private:
 
   void keyPressEvent(QKeyEvent* event) override;

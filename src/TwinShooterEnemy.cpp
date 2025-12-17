@@ -40,6 +40,10 @@ std::vector<std::unique_ptr<Bullet>> TwinShooterEnemy::Fire(Direction dir) {
   std::vector<std::unique_ptr<Bullet>> bullets;
   QPointF pos = this->pos();
 
+  // Если танк едет вверх или вниз рассчитываются две позиции для выстрелов
+  // bx1 и bx2  это смещенные относительно центра танка координаты X для двух пуль
+  // by  координата Y если вверх, то чуть выше танка, если вниз то чуть ниже
+  // создаются две пули, летящие параллельно друг другу
   if (dir == Direction::Up || dir == Direction::Down) {
     qreal bx1 = pos.x() + GetWidth() / 2 - 8;
     qreal bx2 = pos.x() + GetWidth() / 2 + 8;

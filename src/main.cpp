@@ -1,12 +1,12 @@
 #include <QApplication>
 #include <QGraphicsView>
-#include "GameScane.h"
+#include "GameScene.h"
 #include "GlobalConstants.h"
 
 int main(int argc, char* argv[]) {
   QApplication app(argc, argv);
 
-  GameScane* scene = new GameScane();
+  GameScene* scene = new GameScene();
   QGraphicsView* view = new QGraphicsView(scene);
 
   view->setFixedSize(kSceneWidth, kSceneHeight);

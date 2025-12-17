@@ -12,10 +12,10 @@ find_package(Qt5 REQUIRED COMPONENTS Core Widgets Multimedia)
 
 add_executable(TanksGame
         src/main.cpp
-        src/GameScane.cpp
+        src/GameScene.cpp
         src/GameModel.cpp
         src/InputController.cpp
-        include/GameScane.h
+        include/GameScene.h
         include/GameModel.h
         include/InputController.h
         src/Bonus.cpp
@@ -30,7 +30,6 @@ add_executable(TanksGame
         src/BrickWall.cpp
         src/Bullet.cpp
         include/TankView.h
-        include/GameScane.h
 )
 
 target_link_libraries(TanksGame PRIVATE

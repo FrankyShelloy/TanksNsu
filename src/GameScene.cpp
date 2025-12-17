@@ -1,4 +1,12 @@
-#include "GameScane.h"
+#include <cstdint>
+
+enum class EnemyType : int {
+  Light = 0,
+  Heavy = 1,
+  Twin = 2,
+  Kamikaze = 3
+};
+#include "GameScene.h"
 
 #include <QKeyEvent>
 #include <QList>
@@ -28,7 +36,7 @@
 
 static int s_playerFireCooldown = 0;
 
-GameScane::GameScane(QObject* parent)
+GameScene::GameScene(QObject* parent)
     : QGraphicsScene(parent),
       m_canFire(true),
       m_enemySpawnCooldown(kSpawnCooldown) {
@@ -53,18 +61,18 @@ GameScane::GameScane(QObject* parent)
   InitializeLevel();
 
   m_gameTimer.setInterval(1000 / 60);
-  connect(&m_gameTimer, &QTimer::timeout, this, &GameScane::Update);
+  connect(&m_gameTimer, &QTimer::timeout, this, &GameScene::Update);
   m_gameTimer.start();
 
-  connect(m_model, &GameModel::livesChanged, this, &GameScane::UpdateLivesDisplay);
-  connect(m_model, &GameModel::scoreChanged, this, &GameScane::UpdateScoreDisplay);
-  connect(m_model, &GameModel::gameOver, this, &GameScane::ShowGameOver);
-  connect(m_model, &GameModel::gameWon, this, &GameScane::ShowWinScreen);
+  connect(m_model, &GameModel::livesChanged, this, &GameScene::UpdateLivesDisplay);
+  connect(m_model, &GameModel::scoreChanged, this, &GameScene::UpdateScoreDisplay);
+  connect(m_model, &GameModel::gameOver, this, &GameScene::ShowGameOver);
+  connect(m_model, &GameModel::gameWon, this, &GameScene::ShowWinScreen);
   UpdateLivesDisplay();
   UpdateScoreDisplay();
 
   m_inputController = new InputController(m_model, this);
-  connect(m_inputController, &InputController::restartRequested, this, &GameScane::RestartGame);
+  connect(m_inputController, &InputController::restartRequested, this, &GameScene::RestartGame);
   connect(m_inputController, &InputController::fireRequested, this, [this]() {
     if (m_canFire && !m_model->IsGameOver()) {
       FireBullet();
@@ -79,7 +87,7 @@ GameScane::GameScane(QObject* parent)
   m_enemyFactory.Register("kamikaze", []() -> std::unique_ptr<EnemyTank> { return std::make_unique<KamikazeEnemy>(0.0, 0.0); });
 }
 
-GameScane::~GameScane() {
+GameScene::~GameScene() {
   if (m_model) {
     for (auto* b : m_model->GetBullets()) if (b) removeItem(b);
     for (auto* b : m_model->GetEnemyBullets()) if (b) removeItem(b);
@@ -120,7 +128,7 @@ GameScane::~GameScane() {
   delete m_model;
 }
 
-void GameScane::InitializeLevel() {
+void GameScene::InitializeLevel() {
   const char* levelMap[kMapRows] = {
       "WWWWWWWWWWWWWWWWWWWW",
       "W                  W",
@@ -181,7 +189,7 @@ void GameScane::InitializeLevel() {
   }
 }
 
-void GameScane::Update() {
+void GameScene::Update() {
   if (m_model->IsGameOver() || m_model->IsGameWon()) {
     return;
   }
@@ -197,7 +205,7 @@ void GameScane::Update() {
   m_canFire = (s_playerFireCooldown <= 0);
 }
 
-void GameScane::HandlePlayerInputAndMovement() {
+void GameScene::HandlePlayerInputAndMovement() {
   auto* player = m_model->GetPlayer();
   Direction desiredDirection = player->GetDirection();
   bool shouldMove = false;
@@ -232,7 +240,7 @@ void GameScane::HandlePlayerInputAndMovement() {
   player->Update();
 }
 
-void GameScane::SpawnEnemiesIfNeeded() {
+void GameScene::SpawnEnemiesIfNeeded() {
   if (m_enemySpawnCooldown > 0) {
     --m_enemySpawnCooldown;
     return;
@@ -244,18 +252,19 @@ void GameScane::SpawnEnemiesIfNeeded() {
 
   int idx = QRandomGenerator::global()->bounded(m_freeSpawnPoints.size());
   QPointF spawnPos = m_freeSpawnPoints[idx];
-  int type = QRandomGenerator::global()->bounded(0, 4);
+  EnemyType type = static_cast<EnemyType>(QRandomGenerator::global()->bounded(0, 4));
   std::unique_ptr<EnemyTank> uptr;
   switch (type) {
-    case 0:
+    case EnemyType::Light:
       uptr = m_enemyFactory.CreateObject("light");
       break;
-    case 1:
+    case EnemyType::Heavy:
       uptr = m_enemyFactory.CreateObject("heavy");
       break;
-    case 2:
+    case EnemyType::Twin:
       uptr = m_enemyFactory.CreateObject("twin");
       break;
+    case EnemyType::Kamikaze:
     default:
       uptr = m_enemyFactory.CreateObject("kamikaze");
       break;
@@ -269,7 +278,7 @@ void GameScane::SpawnEnemiesIfNeeded() {
   }
 }
 
-void GameScane::UpdateEnemies() {
+void GameScene::UpdateEnemies() {
   auto enemiesCopy = m_model->GetEnemyTanks();
   for (auto* enemy : enemiesCopy) {
     enemy->Update();
@@ -363,7 +372,7 @@ void GameScane::UpdateEnemies() {
   }
 }
 
-void GameScane::UpdatePlayerBullets() {
+void GameScene::UpdatePlayerBullets() {
   if (!m_model) return;
   for (int i = (int)m_model->GetBulletsCount() - 1; i >= 0; --i) {
     Bullet* bullet = m_model->GetBulletAt((size_t)i);
@@ -419,7 +428,7 @@ void GameScane::UpdatePlayerBullets() {
   }
 }
 
-void GameScane::UpdateEnemyBullets() {
+void GameScene::UpdateEnemyBullets() {
   if (!m_model) return;
   for (int i = (int)m_model->GetEnemyBulletsCount() - 1; i >= 0; --i) {
     Bullet* bullet = m_model->GetEnemyBulletAt((size_t)i);
@@ -460,7 +469,7 @@ void GameScane::UpdateEnemyBullets() {
   }
 }
 
-void GameScane::UpdateBonuses() {
+void GameScene::UpdateBonuses() {
   if (!m_model || !m_model->GetPlayer()) return;
 
   if (!m_playerView) return;
@@ -479,25 +488,25 @@ void GameScane::UpdateBonuses() {
   }
 }
 
-void GameScane::ModifyPlayerLives(int delta) {
+void GameScene::ModifyPlayerLives(int delta) {
   if (m_model) m_model->ModifyPlayerLives(delta);
 }
 
-void GameScane::ModifyScore(int delta) {
+void GameScene::ModifyScore(int delta) {
   if (m_model) m_model->ModifyScore(delta);
 }
 
-void GameScane::keyPressEvent(QKeyEvent* event) {
+void GameScene::keyPressEvent(QKeyEvent* event) {
   if (m_inputController) m_inputController->HandleKeyPress(event);
   QGraphicsScene::keyPressEvent(event);
 }
 
-void GameScane::keyReleaseEvent(QKeyEvent* event) {
+void GameScene::keyReleaseEvent(QKeyEvent* event) {
   if (m_inputController) m_inputController->HandleKeyRelease(event);
   QGraphicsScene::keyReleaseEvent(event);
 }
 
-bool GameScane::IsCollidingWithSolidWall(const QRectF& rect) const {
+bool GameScene::IsCollidingWithSolidWall(const QRectF& rect) const {
   if (!m_model) return false;
   for (size_t i = 0; i < m_model->GetWallsCount(); ++i) {
     const auto* wall = m_model->GetWallAt(i);
@@ -508,7 +517,7 @@ bool GameScane::IsCollidingWithSolidWall(const QRectF& rect) const {
   return false;
 }
 
-BrickWall* GameScane::FindCollidingBrickWall(const QRectF& rect) const {
+BrickWall* GameScene::FindCollidingBrickWall(const QRectF& rect) const {
   if (!m_model) return nullptr;
   for (size_t i = 0; i < m_model->GetBricksCount(); ++i) {
     BrickWall* brick = m_model->GetBrickAt(i);
@@ -519,11 +528,11 @@ BrickWall* GameScane::FindCollidingBrickWall(const QRectF& rect) const {
   return nullptr;
 }
 
-bool GameScane::IsCollidingWithAnyWall(const QRectF& rect) const {
+bool GameScene::IsCollidingWithAnyWall(const QRectF& rect) const {
   return IsCollidingWithSolidWall(rect) || (FindCollidingBrickWall(rect) != nullptr);
 }
 
-void GameScane::FireBullet() {
+void GameScene::FireBullet() {
   auto* player = m_model->GetPlayer();
   QPointF tankPos = player->GetPosition();
   Direction direction = player->GetDirection();
@@ -559,7 +568,7 @@ void GameScane::FireBullet() {
   m_model->AddBullet(std::move(bullet));
 }
 
-void GameScane::ShowGameOver() {
+void GameScene::ShowGameOver() {
   m_overlay = new QGraphicsRectItem(0, 0, kSceneWidth, kSceneHeight);
   m_overlay->setBrush(QColor(0, 0, 0, 180));
   m_overlay->setPen(Qt::NoPen);
@@ -591,7 +600,7 @@ void GameScane::ShowGameOver() {
   for (auto* v : views()) if (v) v->setFocus();
 }
 
-void GameScane::ShowWinScreen() {
+void GameScene::ShowWinScreen() {
   m_winOverlay = new QGraphicsRectItem(0, 0, kSceneWidth, kSceneHeight);
   m_winOverlay->setBrush(QColor(0, 0, 0, 180));
   m_winOverlay->setPen(Qt::NoPen);
@@ -623,15 +632,19 @@ void GameScane::ShowWinScreen() {
   for (auto* v : views()) if (v) v->setFocus();
 }
 
-void GameScane::UpdateLivesDisplay() {
-  int lives = m_model ? m_model->GetLives() : 0;
-  m_livesText->setPlainText(QString("Lives: %1").arg(lives));
+void GameScene::SetLivesTextStyle() {
   m_livesText->setDefaultTextColor(Qt::white);
   m_livesText->setFont(QFont("Arial", 16, QFont::Bold));
   m_livesText->setPos(5, 5);
 }
 
-void GameScane::UpdateScoreDisplay() {
+void GameScene::UpdateLivesDisplay() {
+  int lives = m_model ? m_model->GetLives() : 0;
+  m_livesText->setPlainText(QString("Lives: %1").arg(lives));
+  SetLivesTextStyle();
+}
+
+void GameScene::UpdateScoreDisplay() {
   int kills = m_model ? m_model->GetKills() : 0;
   m_scoreText->setPlainText(QString("Kills: %1").arg(kills));
   m_scoreText->setDefaultTextColor(Qt::yellow);
@@ -639,7 +652,7 @@ void GameScane::UpdateScoreDisplay() {
   m_scoreText->setPos(513, 5);
 }
 
-void GameScane::RestartGame() {
+void GameScene::RestartGame() {
   auto cleanupUnique = [this](auto& container) {
     for (auto& uptr : container) {
       if (uptr) removeItem(uptr.get());
